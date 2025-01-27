@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #ffffff;
+            --font-color: #333333;
+            --font-family: Arial, sans-serif;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border: 5px solid blue;
+            border-radius: 50%;
+            animation: rotate 50s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-container img {
+            width: 90%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .school-name {
+            font-size: 2.0em;
+            font-weight: bold;
+            color: blue;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+            margin-top: 10px;
+            animation: text3D 1.5s ease-in-out infinite alternate;
+        }
+            .nav a {
+                font-size: 2.0em;
+                margin-top: 10px;
+                background-color: blue;
+                color: white;
+            }
+            p {
+                font-size: 1.4em;
+                margin: 20px;
+                text-align: center;
+                color: blue;
+            }
+
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .dropdown-btn {
+            background-color: blue;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1.4em;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-btn:hover {
+            background-color: #45a049;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 260px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 5px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 5px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropdown-btn {
+            background-color: #45a049;
+        }
+
+        /* Button styling */
+        .btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 15px;
+            font-size: 1.4em;
+            color: white;
+            background-color: blue;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes text3D {
+            0% {
+                text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+                transform: scale(1.1);
+            }
+            100% {
+                text-shadow: 2px 2px 20px rgba(0, 0, 0, 0.7);
+                transform: scale(1.2);
+            }
+        }
+
+        /* Additional styles for responsiveness */
+        @media (max-width: 768px) {
+            .header {
+                margin-bottom: 15px;
+            }
+
+            .logo-container {
+                width: 120px;
+                height: 120px;
+            }
+
+            .school-name {
+                font-size: 1.7em;
+                margin-top: 10px;
+            }
+
+            .nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav a {
+                font-size: 2.0em;
+                margin-top: 10px;
+            }
+
+            .admin-container {
+                padding: 15px;
+            }
+
+            form {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            form input, form select, form button {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .school-name {
+                font-size: 1.0em;
+            }
+
+            .logo-container {
+                width: 100px;
+                height: 100px;
+            }
+
+            .nav a {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with logo and school name -->
+    <div class="header">
+        <!-- Logo -->
+        <div class="logo-container">
+            <img src="logo.png" alt="School Logo">
+        </div>
+        <!-- School Name with 3D effect -->
+<div class="school-name">Accountant - Dashboard
+</div>
+        <!-- Navigation Links -->
+        <div class="nav">
+            <a href="index2.html">Home</a>
+        </div>
+    </div>
+
+    <!-- Dashboard container -->
+    <div class="dashboard-container">
+        <div id="welcomeMessage"></div>
+
+        <style>
+            /* Default button styling */
+            .btn {
+                font-size: 18px; 
+                padding: 10px 20px;
+            }
+            /* Responsive styling for smaller screens */
+            @media (max-width: 600px) {
+                .btn {
+                    font-size: 14px; /* Smaller text size */
+                    padding: 8px 16px; /* Reduced padding */
+                }
+            }
+        </style>
+         <p>Please select your current session and term from the dropdown below, to proceed.</p>
+                        `;
+        <!-- Dropdown Menu for Terms -->
+        <div class="dropdown">
+            <button class="dropdown-btn">Select your current session</button>
+            <div class="dropdown-content">
+                <a href="/term/1">First Term - 2024/2025</a>
+                <a href="/term/2">Second Term - 2024/2025</a>
+                <a href="/term/3">Third Term - 2024/2025</a>
+                <a href="/term/4">First Term - 2025/2026</a>
+                <a href="/term/5">Second Term - 2025/2026</a>
+                <a href="/term/6">Third Term - 2025/2026</a>
+                <a href="/term/7">First Term - 2026/2027</a>
+                <a href="/term/8">Second Term - 2026/2027</a>
+                <a href="/term/9">Third Term - 2026/2027</a>
+            </div>
+        </div>
+        
+        <button onclick="logoutUser()" class="btn">Logout</button>
+    </div>
+
+    <!-- Firebase SDKs for version 9 and above (modular approach) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js";
+        
+        // Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDr1XsWltrYOMXT7_MqylD8bOTGjikmYzE",
+  authDomain: "riders-5ad93.firebaseapp.com",
+  databaseURL: "https://riders-5ad93-default-rtdb.firebaseio.com",
+  projectId: "riders-5ad93",
+  storageBucket: "riders-5ad93.firebasestorage.app",
+  messagingSenderId: "956987352089",
+  appId: "1:956987352089:web:bee471f0cb74626bbb7688"
+};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Listen for user authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const usersCollection = collection(db, "users");
+                const q = query(usersCollection, where("uid", "==", user.uid));
+
+                getDocs(q).then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
+                        const userDoc = querySnapshot.docs[0].data();
+                        const role = userDoc.role;
+                        const name = userDoc.firstName + " " + userDoc.lastName;
+                        const userClass = userDoc.userClass;
+
+document.getElementById("welcomeMessage").innerHTML = `
+  <div style="font-family: 'Arial', sans-serif; font-size: 1.2em; color: blue; text-align: center; margin: 20px 0;">
+    <span style="font-size: 2em; color: blue; font-weight: bold;">Welcome, ${name}!</span><br>
+
+    <!-- Class Frame -->
+    <div style="display: inline-block; padding: 10px 20px; background-color: blue; color: white; border-radius: 8px; margin: 10px 0; font-size: 1.0em;">
+      <span>${userClass}</span>
+    </div><br>
+
+
+`;
+
+
+
+                        const resourceButton = document.getElementById("exploreResources");
+                        resourceButton.innerText = `Explore your ${userClass} class resources`;
+                        resourceButton.href = getResourceLink(userClass);
+                    }
+                }).catch((error) => {
+                    console.error("Error fetching user data from Firestore: ", error);
+                });
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+
+
+        window.logoutUser = function logoutUser() {
+            signOut(auth).then(() => {
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Error logging out: ", error);
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Plan Submission</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fb;
+        }
+        header {
+            background-color: #3c8dbc;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .form-container, .teacher-upload-container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .lesson-card {
+            width: 30%;
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            background-color: #e7f7ff;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .lesson-card h3 {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .lesson-card button {
+            background-color: #ff6347;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .lesson-card a {
+            display: block;
+            margin-top: 10px;
+            color: #1e90ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Lesson Plan Submission</h1>
+    </header>
+
+    <!-- Teacher Submission Form -->
+    <div class="form-container">
+        <h2>Submit Lesson Plan</h2>
+        <form id="lessonForm">
+            <select id="subject" required>
+                <option value="Science">Science</option>
+                <option value="Home Economics">Home Economics</option>
+                <option value="Geography">Geography</option>
+                <option value="Agricultural Science">Agricultural Science</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Civic Education">Civic Education</option>
+                <option value="English Studies">English Studies</option>
+                <option value="History">History</option>
+                <option value="Religious Studies (CRS/IRS)">Religious Studies (CRS/IRS)</option>
+                <option value="Information and Communication Technology">Information and Communication Technology</option>
+                <option value="Personal Social and Health Education (PSHE)">Personal Social and Health Education (PSHE)</option>
+                <option value="General Knowledge">General Knowledge</option>
+            </select>
+            <input type="text" id="topic" placeholder="Topic" required>
+            <input type="text" id="week" placeholder="Week" required>
+            <input type="text" id="googleDocLink" placeholder="Google Docs Link" required>
+            <button type="submit">Submit Lesson Plan</button>
+        </form>
+    </div>
+
+    <!-- Filter Section for Teacher -->
+    <div class="teacher-upload-container">
+        <h2>Filter by Subject</h2>
+        <select id="subjectFilter" onchange="filterBySubject()">
+            <option value="All">All</option>
+            <option value="Science">Science</option>
+            <option value="Home Economics">Home Economics</option>
+            <option value="Geography">Geography</option>
+            <option value="Agricultural Science">Agricultural Science</option>
+            <option value="Mathematics">Mathematics</option>
+            <option value="Civic Education">Civic Education</option>
+            <option value="English Studies">English Studies</option>
+            <option value="History">History</option>
+            <option value="Religious Studies (CRS/IRS)">Religious Studies (CRS/IRS)</option>
+            <option value="Information and Communication Technology">Information and Communication Technology</option>
+            <option value="Personal Social and Health Education (PSHE)">Personal Social and Health Education (PSHE)</option>
+            <option value="General Knowledge">General Knowledge</option>
+        </select>
+    </div>
+
+    <!-- Pending Approval Section for Teacher -->
+    <div class="teacher-upload-container">
+        <h2>Your Pending Lesson Plans</h2>
+        <div id="pendingLessons"></div>
+    </div>
+
+    <!-- Approved Lesson Plans Section for Teacher -->
+    <div class="teacher-upload-container">
+        <h2>Approved Lesson Plans</h2>
+        <div id="lessonCards"></div>
+    </div>
+
+    <!-- Firebase v9+ CDN (use modules) -->
+    <script type="module">
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-yDq_hasmJ-feBHqNv7d8TxiIRORw9nE",
+            authDomain: "year5f-ff94c.firebaseapp.com",
+            databaseURL: "https://year5f-ff94c-default-rtdb.firebaseio.com",
+            projectId: "year5f-ff94c",
+            storageBucket: "year5f-ff94c.firebasestorage.app",
+            messagingSenderId: "725619624649",
+            appId: "1:725619624649:web:8752cd00889bb07d41db18"
+        };
+
+        // Importing the necessary Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Submit Lesson Plan (for teacher)
+        const lessonForm = document.getElementById("lessonForm");
+
+        lessonForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            
+            const subject = document.getElementById("subject").value;
+            const topic = document.getElementById("topic").value;
+            const week = document.getElementById("week").value;
+            const googleDocLink = document.getElementById("googleDocLink").value;
+
+            const lessonPlansRef = ref(database, 'lessonPlans'); // Reference to the 'lessonPlans' node
+            const newLessonRef = push(lessonPlansRef); // Create a new key for the lesson plan
+            
+            // Create the lesson object to be saved
+            const lessonData = {
+                subject: subject,
+                topic: topic,
+                week: week,
+                googleDocLink: googleDocLink,
+                status: "pending" // pending approval by HOD
+            };
+
+            // Set the lesson data at the new key location
+            set(newLessonRef, lessonData)
+                .then(() => {
+                    // Clear form
+                    lessonForm.reset();
+                    alert("Lesson Plan Submitted for Approval");
+                })
+                .catch((error) => {
+                    console.error("Error saving lesson plan: ", error);
+                });
+        });
+
+        // Load all lesson plans (approved only)
+        function loadAllLessons() {
+            const lessonCardsContainer = document.getElementById("lessonCards");
+            const lessonPlansRef = ref(database, 'lessonPlans');
+            
+            get(lessonPlansRef).then((snapshot) => {
+                lessonCardsContainer.innerHTML = ""; // Clear existing cards
+                snapshot.forEach((childSnapshot) => {
+                    const lesson = childSnapshot.val();
+                    const status = lesson.status;
+
+                    // Filter lessons by status on the client side (approved lessons)
+                    if (status === "approved") {
+                        const lessonCard = document.createElement("div");
+                        lessonCard.classList.add("lesson-card");
+                        lessonCard.innerHTML = `
+                            <h3>${lesson.subject} - ${lesson.topic}</h3>
+                            <p>Week: ${lesson.week}</p>
+                            <a href="${lesson.googleDocLink}" target="_blank">View Content</a>
+                        `;
+                        lessonCardsContainer.appendChild(lessonCard);
+                    }
+                });
+            }).catch((error) => {
+                console.error("Error fetching lesson plans:", error);
+            });
+        }
+
+        // Load Pending Lessons for Teacher (lessons that the teacher has submitted)
+        function loadPendingLessons() {
+            const pendingLessonsContainer = document.getElementById("pendingLessons");
+            const lessonPlansRef = ref(database, 'lessonPlans');
+            
+            get(lessonPlansRef).then((snapshot) => {
+                pendingLessonsContainer.innerHTML = ""; // Clear any existing content
+                snapshot.forEach((childSnapshot) => {
+                    const lesson = childSnapshot.val();
+                    const status = lesson.status;
+
+                    // Only show the teacher's own pending lessons (status === 'pending')
+                    if (status === "pending") {
+                        const lessonCard = document.createElement("div");
+                        lessonCard.classList.add("lesson-card");
+                        lessonCard.innerHTML = `
+                            <h3>${lesson.subject} - ${lesson.topic}</h3>
+                            <p>Week: ${lesson.week}</p>
+                            <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
+                            <p>Status: Pending Approval</p>
+                        `;
+                        pendingLessonsContainer.appendChild(lessonCard);
+                    }
+                });
+            }).catch((error) => {
+                console.error("Error fetching pending lesson plans:", error);
+            });
+        }
+
+        // Filter Lessons based on the selected subject
+        function filterBySubject() {
+            const subjectFilter = document.getElementById("subjectFilter").value;
+            const lessonCardsContainer = document.getElementById("lessonCards");
+            const pendingLessonsContainer = document.getElementById("pendingLessons");
+            const lessonPlansRef = ref(database, 'lessonPlans');
+
+            get(lessonPlansRef).then((snapshot) => {
+                lessonCardsContainer.innerHTML = "";
+                pendingLessonsContainer.innerHTML = "";
+
+                snapshot.forEach((childSnapshot) => {
+                    const lesson = childSnapshot.val();
+                    const status = lesson.status;
+
+                    // Filter by subject (if subject is selected)
+                    if (subjectFilter === "All" || lesson.subject === subjectFilter) {
+                        const lessonCard = document.createElement("div");
+                        lessonCard.classList.add("lesson-card");
+                        lessonCard.innerHTML = `
+                            <h3>${lesson.subject} - ${lesson.topic}</h3>
+                            <p>Week: ${lesson.week}</p>
+                            <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
+                        `;
+                        
+                        if (status === "approved") {
+                            lessonCardsContainer.appendChild(lessonCard);
+                        } else if (status === "pending") {
+                            lessonCard.innerHTML += `<p>Status: Pending Approval</p>`;
+                            pendingLessonsContainer.appendChild(lessonCard);
+                        }
+                    }
+                });
+            }).catch((error) => {
+                console.error("Error fetching lesson plans:", error);
+            });
+        }
+
+        // Initialize the page by loading lessons
+        loadAllLessons();
+        loadPendingLessons();
+    </script>
+
+</body>
+</html>

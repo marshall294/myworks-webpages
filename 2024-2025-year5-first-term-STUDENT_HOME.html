@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Orli International Academy</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #3a7bd5, #3a6073);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      border: 5px solid #fff;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #3a6073;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo img {
+      width: 80%;
+      border-radius: 50%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 10px 0 30px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 2px 2px 4px #000;
+      letter-spacing: 2px;
+    }
+
+    .dropdown {
+      perspective: 1000px;
+      margin-bottom: 20px;
+    }
+
+    .dropdown-content {
+      position: relative;
+      width: 100%;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      transform: rotateX(-15deg);
+      transition: transform 0.5s;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .dropdown:hover .dropdown-content {
+      transform: rotateX(0);
+    }
+
+    .dropdown a {
+      display: block;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .dropdown a:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown a:hover {
+      background: #3a7bd5;
+      color: #fff;
+    }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .nav-buttons button {
+      padding: 10px 20px;
+      background: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #3a6073;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .nav-buttons button:hover {
+      background: #3a7bd5;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .dropdown a {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+      }
+
+      .nav-buttons button {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="logo.png" alt="Orli Logo">
+    </div>
+    <h1>Welcome to First Term 2024-2025</h1>
+    <div class="dropdown">
+      <div class="dropdown-content">
+        <a href="2024-2025-year5-first-term-notes-view.html">Lesson Notes</a>
+        <a href="2024-2025-year5-first-term-cbt-assessment.html">CBT Assessments</a>
+        <a href="2024-2025-year5-first-term-student-theory-view.html">Essay-Type Assessments</a>
+        <a href="#results">Results (Not available for now)</a>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button onclick="goHome()">Home</button>
+      <button onclick="goHome()">Home</button>
+    </div>
+  </div>
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+
+    function goHome() {
+      window.location.href = "student-dashboard.html";
+    }
+  </script>
+</body>
+</html>

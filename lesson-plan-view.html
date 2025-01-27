@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOD Lesson Plan Approval</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fb;
+        }
+        header {
+            background-color: #3c8dbc;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .form-container, .teacher-upload-container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .lesson-card {
+            width: 30%;
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            background-color: #e7f7ff;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .lesson-card h3 {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .lesson-card button {
+            background-color: #ff6347;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>HOD Lesson Plan Approval</h1>
+    </header>
+
+    <!-- HOD Pending Lessons for Approval -->
+    <div class="teacher-upload-container">
+        <h2>Pending Lesson Plans</h2>
+        <div id="pendingLessons"></div>
+    </div>
+
+    <!-- Firebase v9+ CDN (use modules) -->
+    <script type="module">
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyB-yDq_hasmJ-feBHqNv7d8TxiIRORw9nE",
+            authDomain: "year5f-ff94c.firebaseapp.com",
+            databaseURL: "https://year5f-ff94c-default-rtdb.firebaseio.com",
+            projectId: "year5f-ff94c",
+            storageBucket: "year5f-ff94c.firebasestorage.app",
+            messagingSenderId: "725619624649",
+            appId: "1:725619624649:web:8752cd00889bb07d41db18"
+        };
+
+        // Importing Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Load Pending Lessons for HOD Approval
+        function loadPendingLessonsForHOD() {
+            const pendingLessonsContainer = document.getElementById("pendingLessons");
+            const lessonPlansRef = ref(database, 'lessonPlans');
+            
+            get(lessonPlansRef).then((snapshot) => {
+                pendingLessonsContainer.innerHTML = ""; // Clear any existing content
+                snapshot.forEach((childSnapshot) => {
+                    const lesson = childSnapshot.val();
+                    const status = lesson.status;
+
+                    // Only load pending lessons
+                    if (status === "pending") {
+                        const lessonCard = document.createElement("div");
+                        lessonCard.classList.add("lesson-card");
+                        lessonCard.innerHTML = `
+                            <h3>${lesson.subject} - ${lesson.topic}</h3>
+                            <p>Week: ${lesson.week}</p>
+                            <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
+                            <button class="approve-btn" data-lesson-key="${childSnapshot.key}">Approve</button>
+                        `;
+                        pendingLessonsContainer.appendChild(lessonCard);
+                    }
+                });
+
+                // Attach event listeners to the "Approve" buttons
+                const approveButtons = document.querySelectorAll('.approve-btn');
+                approveButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const lessonKey = button.getAttribute('data-lesson-key');
+                        approveLessonPlan(lessonKey);
+                    });
+                });
+
+            }).catch((error) => {
+                console.error("Error fetching pending lesson plans:", error);
+            });
+        }
+
+        // Approve Lesson Plan
+        function approveLessonPlan(lessonKey) {
+            const lessonRef = ref(database, 'lessonPlans/' + lessonKey);
+            
+            // Update the status of the lesson plan to 'approved'
+            update(lessonRef, {
+                status: 'approved'
+            }).then(() => {
+                loadPendingLessonsForHOD(); // Reload pending lessons after approval
+                alert("Lesson Plan Approved");
+            }).catch((error) => {
+                console.error("Error approving lesson plan:", error);
+            });
+        }
+
+        // Initialize the page by loading pending lessons
+        loadPendingLessonsForHOD();
+    </script>
+
+</body>
+</html>
