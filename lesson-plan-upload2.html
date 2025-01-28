@@ -134,162 +134,192 @@
     </div>
 
     <!-- Firebase v9+ CDN (use modules) -->
-    <script type="module">
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-yDq_hasmJ-feBHqNv7d8TxiIRORw9nE",
-            authDomain: "year5f-ff94c.firebaseapp.com",
-            databaseURL: "https://year5f-ff94c-default-rtdb.firebaseio.com",
-            projectId: "year5f-ff94c",
-            storageBucket: "year5f-ff94c.firebasestorage.app",
-            messagingSenderId: "725619624649",
-            appId: "1:725619624649:web:8752cd00889bb07d41db18"
-        };
+<script type="module">
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCItKIQ015G4u6XbvXi_-_5ArKd73yf5ak",
+    authDomain: "year5-6f785.firebaseapp.com",
+    databaseURL: "https://year5-6f785-default-rtdb.firebaseio.com",
+    projectId: "year5-6f785",
+    storageBucket: "year5-6f785.appspot.com",
+    messagingSenderId: "904150572094",
+    appId: "1:904150572094:web:e2fbc29bcd94f34b95056f",
+  };
 
-        // Importing the necessary Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-        import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
+  // Importing Firebase modules
+  import {
+    initializeApp,
+  } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+  import {
+    getDatabase,
+    ref,
+    push,
+    set,
+    get,
+    remove,
+  } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const auth = getAuth(app);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
 
-        // Submit Lesson Plan (for teacher)
-        const lessonForm = document.getElementById("lessonForm");
+  // Submit Lesson Plan (for teacher)
+  const lessonForm = document.getElementById("lessonForm");
 
-        lessonForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            
-            const subject = document.getElementById("subject").value;
-            const topic = document.getElementById("topic").value;
-            const week = document.getElementById("week").value;
-            const googleDocLink = document.getElementById("googleDocLink").value;
+  lessonForm.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-            const lessonPlansRef = ref(database, 'lessonPlans'); // Reference to the 'lessonPlans' node
-            const newLessonRef = push(lessonPlansRef); // Create a new key for the lesson plan
-            
-            // Create the lesson object to be saved
-            const lessonData = {
-                subject: subject,
-                topic: topic,
-                week: week,
-                googleDocLink: googleDocLink,
-                status: "pending" // pending approval by HOD
-            };
+    const subject = document.getElementById("subject").value;
+    const topic = document.getElementById("topic").value;
+    const week = document.getElementById("week").value;
+    const googleDocLink = document.getElementById("googleDocLink").value;
 
-            // Set the lesson data at the new key location
-            set(newLessonRef, lessonData)
-                .then(() => {
-                    // Clear form
-                    lessonForm.reset();
-                    alert("Lesson Plan Submitted for Approval");
-                })
-                .catch((error) => {
-                    console.error("Error saving lesson plan: ", error);
-                });
+    const lessonPlansRef = ref(database, "lessonPlans");
+    const newLessonRef = push(lessonPlansRef);
+
+    const lessonData = {
+      subject: subject,
+      topic: topic,
+      week: week,
+      googleDocLink: googleDocLink,
+      status: "pending",
+    };
+
+    set(newLessonRef, lessonData)
+      .then(() => {
+        lessonForm.reset();
+        alert("Lesson Plan Submitted for Approval");
+      })
+      .catch((error) => {
+        console.error("Error saving lesson plan: ", error);
+      });
+  });
+
+  // Load all lesson plans (approved only)
+  function loadAllLessons() {
+    const lessonCardsContainer = document.getElementById("lessonCards");
+    const lessonPlansRef = ref(database, "lessonPlans");
+
+    get(lessonPlansRef)
+      .then((snapshot) => {
+        lessonCardsContainer.innerHTML = "";
+        snapshot.forEach((childSnapshot) => {
+          const lesson = childSnapshot.val();
+          const status = lesson.status;
+
+          if (status === "approved") {
+            const lessonCard = document.createElement("div");
+            lessonCard.classList.add("lesson-card");
+            lessonCard.innerHTML = `
+              <h3>${lesson.subject} - ${lesson.topic}</h3>
+              <p>Week: ${lesson.week}</p>
+              <a href="${lesson.googleDocLink}" target="_blank">View Content</a>
+              <button onclick="deleteLessonPlan('${childSnapshot.key}')">Delete</button>
+            `;
+            lessonCardsContainer.appendChild(lessonCard);
+          }
         });
+      })
+      .catch((error) => {
+        console.error("Error fetching lesson plans:", error);
+      });
+  }
 
-        // Load all lesson plans (approved only)
-        function loadAllLessons() {
-            const lessonCardsContainer = document.getElementById("lessonCards");
-            const lessonPlansRef = ref(database, 'lessonPlans');
-            
-            get(lessonPlansRef).then((snapshot) => {
-                lessonCardsContainer.innerHTML = ""; // Clear existing cards
-                snapshot.forEach((childSnapshot) => {
-                    const lesson = childSnapshot.val();
-                    const status = lesson.status;
+  // Load Pending Lessons for Teacher
+  function loadPendingLessons() {
+    const pendingLessonsContainer = document.getElementById("pendingLessons");
+    const lessonPlansRef = ref(database, "lessonPlans");
 
-                    // Filter lessons by status on the client side (approved lessons)
-                    if (status === "approved") {
-                        const lessonCard = document.createElement("div");
-                        lessonCard.classList.add("lesson-card");
-                        lessonCard.innerHTML = `
-                            <h3>${lesson.subject} - ${lesson.topic}</h3>
-                            <p>Week: ${lesson.week}</p>
-                            <a href="${lesson.googleDocLink}" target="_blank">View Content</a>
-                        `;
-                        lessonCardsContainer.appendChild(lessonCard);
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error fetching lesson plans:", error);
-            });
-        }
+    get(lessonPlansRef)
+      .then((snapshot) => {
+        pendingLessonsContainer.innerHTML = "";
+        snapshot.forEach((childSnapshot) => {
+          const lesson = childSnapshot.val();
+          const status = lesson.status;
 
-        // Load Pending Lessons for Teacher (lessons that the teacher has submitted)
-        function loadPendingLessons() {
-            const pendingLessonsContainer = document.getElementById("pendingLessons");
-            const lessonPlansRef = ref(database, 'lessonPlans');
-            
-            get(lessonPlansRef).then((snapshot) => {
-                pendingLessonsContainer.innerHTML = ""; // Clear any existing content
-                snapshot.forEach((childSnapshot) => {
-                    const lesson = childSnapshot.val();
-                    const status = lesson.status;
+          if (status === "pending") {
+            const lessonCard = document.createElement("div");
+            lessonCard.classList.add("lesson-card");
+            lessonCard.innerHTML = `
+              <h3>${lesson.subject} - ${lesson.topic}</h3>
+              <p>Week: ${lesson.week}</p>
+              <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
+              <p>Status: Pending Approval</p>
+              <button onclick="deleteLessonPlan('${childSnapshot.key}')">Delete</button>
+            `;
+            pendingLessonsContainer.appendChild(lessonCard);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching pending lesson plans:", error);
+      });
+  }
 
-                    // Only show the teacher's own pending lessons (status === 'pending')
-                    if (status === "pending") {
-                        const lessonCard = document.createElement("div");
-                        lessonCard.classList.add("lesson-card");
-                        lessonCard.innerHTML = `
-                            <h3>${lesson.subject} - ${lesson.topic}</h3>
-                            <p>Week: ${lesson.week}</p>
-                            <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
-                            <p>Status: Pending Approval</p>
-                        `;
-                        pendingLessonsContainer.appendChild(lessonCard);
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error fetching pending lesson plans:", error);
-            });
-        }
+  // Filter Lessons based on the selected subject
+  window.filterBySubject = function() {
+    const subjectFilter = document.getElementById("subjectFilter").value;
+    const lessonCardsContainer = document.getElementById("lessonCards");
+    const pendingLessonsContainer = document.getElementById("pendingLessons");
+    const lessonPlansRef = ref(database, "lessonPlans");
 
-        // Filter Lessons based on the selected subject
-        function filterBySubject() {
-            const subjectFilter = document.getElementById("subjectFilter").value;
-            const lessonCardsContainer = document.getElementById("lessonCards");
-            const pendingLessonsContainer = document.getElementById("pendingLessons");
-            const lessonPlansRef = ref(database, 'lessonPlans');
+    get(lessonPlansRef)
+      .then((snapshot) => {
+        lessonCardsContainer.innerHTML = "";
+        pendingLessonsContainer.innerHTML = "";
 
-            get(lessonPlansRef).then((snapshot) => {
-                lessonCardsContainer.innerHTML = "";
-                pendingLessonsContainer.innerHTML = "";
+        snapshot.forEach((childSnapshot) => {
+          const lesson = childSnapshot.val();
+          const status = lesson.status;
 
-                snapshot.forEach((childSnapshot) => {
-                    const lesson = childSnapshot.val();
-                    const status = lesson.status;
+          if (subjectFilter === "All" || lesson.subject === subjectFilter) {
+            const lessonCard = document.createElement("div");
+            lessonCard.classList.add("lesson-card");
+            lessonCard.innerHTML = `
+              <h3>${lesson.subject} - ${lesson.topic}</h3>
+              <p>Week: ${lesson.week}</p>
+              <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
+              ${
+                status === "pending"
+                  ? `<p>Status: Pending Approval</p>
+                     <button onclick="deleteLessonPlan('${childSnapshot.key}')">Delete</button>`
+                  : `<button onclick="deleteLessonPlan('${childSnapshot.key}')">Delete</button>`
+              }
+            `;
 
-                    // Filter by subject (if subject is selected)
-                    if (subjectFilter === "All" || lesson.subject === subjectFilter) {
-                        const lessonCard = document.createElement("div");
-                        lessonCard.classList.add("lesson-card");
-                        lessonCard.innerHTML = `
-                            <h3>${lesson.subject} - ${lesson.topic}</h3>
-                            <p>Week: ${lesson.week}</p>
-                            <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
-                        `;
-                        
-                        if (status === "approved") {
-                            lessonCardsContainer.appendChild(lessonCard);
-                        } else if (status === "pending") {
-                            lessonCard.innerHTML += `<p>Status: Pending Approval</p>`;
-                            pendingLessonsContainer.appendChild(lessonCard);
-                        }
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error fetching lesson plans:", error);
-            });
-        }
+            if (status === "approved") {
+              lessonCardsContainer.appendChild(lessonCard);
+            } else if (status === "pending") {
+              pendingLessonsContainer.appendChild(lessonCard);
+            }
+          }
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching lesson plans:", error);
+      });
+  };
 
-        // Initialize the page by loading lessons
-        loadAllLessons();
-        loadPendingLessons();
-    </script>
+  // Function to delete a lesson plan
+  window.deleteLessonPlan = function(lessonKey) {
+    const lessonRef = ref(database, `lessonPlans/${lessonKey}`);
 
+    if (confirm("Are you sure you want to delete this lesson plan?")) {
+      remove(lessonRef)
+        .then(() => {
+          alert("Lesson Plan Deleted Successfully");
+          loadAllLessons();
+          loadPendingLessons();
+        })
+        .catch((error) => {
+          console.error("Error deleting lesson plan: ", error);
+        });
+    }
+  };
+
+  // Initialize the page by loading lessons
+  loadAllLessons();
+  loadPendingLessons();
+</script>
 </body>
 </html>
