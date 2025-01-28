@@ -66,175 +66,152 @@
 </head>
 <body>
 
-    <header>
-        <h1>HOD Lesson Plan Approval</h1>
-    </header>
+<header>
+    <h1>HOD Lesson Plan Approval</h1>
+</header>
 
-    <!-- Subject Filter for HOD -->
-    <div class="lesson-approval-container">
-        <h2>Filter by Subject</h2>
-        <select id="subjectFilterHOD" onchange="filterBySubjectHOD()">
-            <option value="All">All</option>
-            <option value="Science">Science</option>
-            <option value="Home Economics">Home Economics</option>
-            <option value="Geography">Geography</option>
-            <option value="Agricultural Science">Agricultural Science</option>
-            <option value="Mathematics">Mathematics</option>
-            <option value="Civic Education">Civic Education</option>
-            <option value="English Studies">English Studies</option>
-            <option value="History">History</option>
-            <option value="Religious Studies (CRS/IRS)">Religious Studies (CRS/IRS)</option>
-            <option value="Information and Communication Technology">Information and Communication Technology</option>
-            <option value="Personal Social and Health Education (PSHE)">Personal Social and Health Education (PSHE)</option>
-            <option value="General Knowledge">General Knowledge</option>
-        </select>
-    </div>
+<!-- Subject Filter for HOD -->
+<div class="lesson-approval-container">
+    <h2>Filter by Subject</h2>
+    <select id="subjectFilterHOD" onchange="filterBySubjectHOD()">
+        <option value="All">All</option>
+        <option value="Science">Science</option>
+        <option value="Home Economics">Home Economics</option>
+        <option value="Geography">Geography</option>
+        <option value="Agricultural Science">Agricultural Science</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="Civic Education">Civic Education</option>
+        <option value="English Studies">English Studies</option>
+        <option value="History">History</option>
+        <option value="Religious Studies (CRS/IRS)">Religious Studies (CRS/IRS)</option>
+        <option value="Information and Communication Technology">Information and Communication Technology</option>
+        <option value="Personal Social and Health Education (PSHE)">Personal Social and Health Education (PSHE)</option>
+        <option value="General Knowledge">General Knowledge</option>
+    </select>
+</div>
 
-    <!-- Pending Lesson Plans for Approval -->
-    <div class="lesson-approval-container">
-        <h2>Pending Lesson Plans</h2>
-        <div id="pendingLessonsHOD"></div>
-    </div>
+<!-- Pending Lesson Plans for Approval -->
+<div class="lesson-approval-container">
+    <h2>Pending Lesson Plans</h2>
+    <div id="pendingLessonsHOD"></div>
+</div>
 
-    <!-- Approved Lesson Plans -->
-    <div class="lesson-approval-container">
-        <h2>Approved Lesson Plans</h2>
-        <div id="approvedLessonsHOD"></div>
-    </div>
+<!-- Approved Lesson Plans -->
+<div class="lesson-approval-container">
+    <h2>Approved Lesson Plans</h2>
+    <div id="approvedLessonsHOD"></div>
+</div>
 
-    <!-- Firebase v9+ CDN (use modules) -->
-    <script type="module">
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyB-yDq_hasmJ-feBHqNv7d8TxiIRORw9nE",
-            authDomain: "year5f-ff94c.firebaseapp.com",
-            databaseURL: "https://year5f-ff94c-default-rtdb.firebaseio.com",
-            projectId: "year5f-ff94c",
-            storageBucket: "year5f-ff94c.firebasestorage.app",
-            messagingSenderId: "725619624649",
-            appId: "1:725619624649:web:8752cd00889bb07d41db18"
-        };
+<!-- Firebase v9+ CDN (use modules) -->
+<script type="module">
+    // Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCItKIQ015G4u6XbvXi_-_5ArKd73yf5ak",
+  authDomain: "year5-6f785.firebaseapp.com",
+  databaseURL: "https://year5-6f785-default-rtdb.firebaseio.com",
+  projectId: "year5-6f785",
+  storageBucket: "year5-6f785.firebasestorage.app",
+  messagingSenderId: "904150572094",
+  appId: "1:904150572094:web:e2fbc29bcd94f34b95056f"
+};
 
-        // Importing the necessary Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js";
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
-        // Load Pending Lessons for HOD (lessons awaiting approval)
-        function loadPendingLessonsHOD() {
-            const pendingLessonsContainer = document.getElementById("pendingLessonsHOD");
-            const lessonPlansRef = ref(database, 'lessonPlans');
-            
-            get(lessonPlansRef).then((snapshot) => {
-                pendingLessonsContainer.innerHTML = ""; // Clear any existing content
-                snapshot.forEach((childSnapshot) => {
-                    const lesson = childSnapshot.val();
-                    const status = lesson.status;
+    // Load Pending Lessons for HOD
+    function loadPendingLessonsHOD() {
+        const pendingLessonsContainer = document.getElementById("pendingLessonsHOD");
+        const lessonPlansRef = ref(database, 'lessonPlans');
 
-                    // Only show lessons with 'pending' status
-                    if (status === "pending") {
-                        const lessonCard = document.createElement("div");
-                        lessonCard.classList.add("lesson-card");
-                        lessonCard.innerHTML = `
+        get(lessonPlansRef).then((snapshot) => {
+            pendingLessonsContainer.innerHTML = "";
+            snapshot.forEach((childSnapshot) => {
+                const lesson = childSnapshot.val();
+                if (lesson.status === "pending") {
+                    const lessonCard = `
+                        <div class="lesson-card">
                             <h3>${lesson.subject} - ${lesson.topic}</h3>
                             <p>Week: ${lesson.week}</p>
                             <a href="${lesson.googleDocLink}" target="_blank">View Content</a>
                             <button onclick="approveLessonPlan('${childSnapshot.key}')">Approve</button>
-                        `;
-                        pendingLessonsContainer.appendChild(lessonCard);
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error fetching pending lesson plans:", error);
+                        </div>`;
+                    pendingLessonsContainer.innerHTML += lessonCard;
+                }
             });
-        }
+        }).catch(console.error);
+    }
 
-        // Load Approved Lessons for HOD
-        function loadApprovedLessonsHOD() {
-            const approvedLessonsContainer = document.getElementById("approvedLessonsHOD");
-            const lessonPlansRef = ref(database, 'lessonPlans');
-            
-            get(lessonPlansRef).then((snapshot) => {
-                approvedLessonsContainer.innerHTML = ""; // Clear any existing content
-                snapshot.forEach((childSnapshot) => {
-                    const lesson = childSnapshot.val();
-                    const status = lesson.status;
+    // Load Approved Lessons for HOD
+    function loadApprovedLessonsHOD() {
+        const approvedLessonsContainer = document.getElementById("approvedLessonsHOD");
+        const lessonPlansRef = ref(database, 'lessonPlans');
 
-                    // Only show lessons with 'approved' status
-                    if (status === "approved") {
-                        const lessonCard = document.createElement("div");
-                        lessonCard.classList.add("lesson-card");
-                        lessonCard.innerHTML = `
+        get(lessonPlansRef).then((snapshot) => {
+            approvedLessonsContainer.innerHTML = "";
+            snapshot.forEach((childSnapshot) => {
+                const lesson = childSnapshot.val();
+                if (lesson.status === "approved") {
+                    const lessonCard = `
+                        <div class="lesson-card">
                             <h3>${lesson.subject} - ${lesson.topic}</h3>
                             <p>Week: ${lesson.week}</p>
-                            <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
-                        `;
-                        approvedLessonsContainer.appendChild(lessonCard);
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error fetching approved lesson plans:", error);
+                            <a href="${lesson.googleDocLink}" target="_blank">View Content</a>
+                        </div>`;
+                    approvedLessonsContainer.innerHTML += lessonCard;
+                }
             });
-        }
+        }).catch(console.error);
+    }
 
-        // Approve Lesson Plan
-        function approveLessonPlan(lessonKey) {
-            const lessonRef = ref(database, 'lessonPlans/' + lessonKey);
-            set(lessonRef, { status: 'approved' }).then(() => {
-                loadPendingLessonsHOD(); // Reload pending lessons after approval
-                loadApprovedLessonsHOD(); // Reload approved lessons
-                alert("Lesson Plan Approved");
-            }).catch((error) => {
-                console.error("Error approving lesson plan:", error);
+    // Approve Lesson Plan
+    function approveLessonPlan(lessonKey) {
+        const lessonRef = ref(database, `lessonPlans/${lessonKey}`);
+        update(lessonRef, { status: "approved" }).then(() => {
+            alert("Lesson Plan Approved");
+            loadPendingLessonsHOD();
+            loadApprovedLessonsHOD();
+        }).catch(console.error);
+    }
+
+    // Filter Lessons by Subject
+    function filterBySubjectHOD() {
+        const subjectFilter = document.getElementById("subjectFilterHOD").value;
+        const lessonPlansRef = ref(database, 'lessonPlans');
+
+        get(lessonPlansRef).then((snapshot) => {
+            document.getElementById("pendingLessonsHOD").innerHTML = "";
+            document.getElementById("approvedLessonsHOD").innerHTML = "";
+            snapshot.forEach((childSnapshot) => {
+                const lesson = childSnapshot.val();
+                const lessonCard = `
+                    <div class="lesson-card">
+                        <h3>${lesson.subject} - ${lesson.topic}</h3>
+                        <p>Week: ${lesson.week}</p>
+                        <a href="${lesson.googleDocLink}" target="_blank">View Content</a>
+                        ${lesson.status === "pending" ? `<button onclick="approveLessonPlan('${childSnapshot.key}')">Approve</button>` : ""}
+                    </div>`;
+                if (subjectFilter === "All" || lesson.subject === subjectFilter) {
+                    const containerId = lesson.status === "pending" ? "pendingLessonsHOD" : "approvedLessonsHOD";
+                    document.getElementById(containerId).innerHTML += lessonCard;
+                }
             });
-        }
+        }).catch(console.error);
+    }
 
-        // Filter Lessons based on the selected subject (for HOD)
-        function filterBySubjectHOD() {
-            const subjectFilterHOD = document.getElementById("subjectFilterHOD").value;
-            const pendingLessonsContainer = document.getElementById("pendingLessonsHOD");
-            const approvedLessonsContainer = document.getElementById("approvedLessonsHOD");
-            const lessonPlansRef = ref(database, 'lessonPlans');
+    // Attach functions to the global `window` object
+    window.loadPendingLessonsHOD = loadPendingLessonsHOD;
+    window.loadApprovedLessonsHOD = loadApprovedLessonsHOD;
+    window.approveLessonPlan = approveLessonPlan;
+    window.filterBySubjectHOD = filterBySubjectHOD;
 
-            get(lessonPlansRef).then((snapshot) => {
-                pendingLessonsContainer.innerHTML = "";
-                approvedLessonsContainer.innerHTML = "";
-
-                snapshot.forEach((childSnapshot) => {
-                    const lesson = childSnapshot.val();
-                    const status = lesson.status;
-
-                    // Filter by subject (if subject is selected)
-                    if (subjectFilterHOD === "All" || lesson.subject === subjectFilterHOD) {
-                        const lessonCard = document.createElement("div");
-                        lessonCard.classList.add("lesson-card");
-                        lessonCard.innerHTML = `
-                            <h3>${lesson.subject} - ${lesson.topic}</h3>
-                            <p>Week: ${lesson.week}</p>
-                            <a href="${lesson.googleDocLink}" target="_blank">View Google Doc</a>
-                        `;
-                        
-                        if (status === "approved") {
-                            approvedLessonsContainer.appendChild(lessonCard);
-                        } else if (status === "pending") {
-                            lessonCard.innerHTML += `<button onclick="approveLessonPlan('${childSnapshot.key}')">Approve</button>`;
-                            pendingLessonsContainer.appendChild(lessonCard);
-                        }
-                    }
-                });
-            }).catch((error) => {
-                console.error("Error fetching lesson plans:", error);
-            });
-        }
-
-        // Initialize the page by loading lessons
-        loadPendingLessonsHOD();
-        loadApprovedLessonsHOD();
-
-    </script>
-
+    // Load lessons on page load
+    loadPendingLessonsHOD();
+    loadApprovedLessonsHOD();
+</script>
 </body>
 </html>
